@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Conversation Topic Picker
 
-## Getting Started
+A colorful mini-game web app for revealing random conversation prompts with configurable safety and depth filters.
 
-First, run the development server:
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```txt
+src/
+  app/
+  components/
+    games/
+    ui/
+  data/
+    topics.ts
+  lib/
+    filterTopics.ts
+  store/
+    useTopicStore.ts
+```
 
-## Learn More
+## How it works
 
-To learn more about Next.js, take a look at the following resources:
+- `src/data/topics.ts`: Topic model and 60+ topic entries.
+- `src/lib/filterTopics.ts`: Safe mode, duration, and depth filtering plus random helper utilities.
+- `src/store/useTopicStore.ts`: Zustand global state for filters, selected mini-game, seen IDs, latest topic, and history.
+- `src/components/games/*`: Isolated mini-game components implementing the same `MiniGameProps` interface.
+- `src/app/page.tsx`: Main UI, filters, game selector, reveal card, clipboard action, and topic history drawer.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Add a new mini-game
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a new component in `src/components/games/`.
+2. Implement the shared game contract from `src/components/games/types.ts`:
+   - `topics: Topic[]`
+   - `onResult: (topic: Topic) => void`
+3. Add it to `GameHost` in `src/components/games/GameHost.tsx`.
+4. Register its key/label in `src/store/useTopicStore.ts` and in the selector mapping in `src/app/page.tsx`.
 
-## Deploy on Vercel
+## Add new topics safely
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+In `src/data/topics.ts`, each topic must include:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `id`: unique string
+- `text`: prompt shown to the user
+- `tags`: array of topic tags (`light`, `deep`, `personal`, `creative`, `reflective`, `political`, `commercial`, `sensitive`)
+- `duration`: `short | medium | long`
+- `depthLevel`: `1 | 2 | 3`
+
+Safe mode is enabled by default and hides topics tagged with `political`, `commercial`, or `sensitive`.
+
+For contributor details, see `CONTRIBUTING.md`.
