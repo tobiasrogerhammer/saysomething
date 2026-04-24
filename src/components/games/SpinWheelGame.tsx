@@ -5,7 +5,6 @@ import type { Topic } from "@/data/topics";
 import { buildInitialWheelTopics, mergePersonalTopicsOntoWheel } from "@/lib/buildWheelTopicList";
 import { launchSpinConfetti } from "@/lib/launchSpinConfetti";
 import type { SuggestionTag } from "@/lib/filterTopics";
-import { matchesSuggestionTag, SUGGESTION_TAGS } from "@/lib/filterTopics";
 import { computeRotationToLandOnIndex, randomSpinDurationMs, sliceIndexUnderPointer } from "@/lib/spinWheelMath";
 import { pickNextQuestionText } from "@/lib/wheelQuestions";
 import type { SpinWheelSegment } from "./spin-wheel/SpinWheel";
@@ -120,15 +119,16 @@ export function SpinWheelGame({
 
   const labelForTopic = useCallback((topic: Topic) => {
     if (topic.id.startsWith("custom-")) return "Yours";
-    const matched = SUGGESTION_TAGS.find((tag) => matchesSuggestionTag(topic, tag));
-    const raw = matched ?? topic.tags[0] ?? "Topic";
+    const matchedSelectedTag = suggestionTags.find((tag) => topic.tags.includes(tag));
+    const raw = matchedSelectedTag ?? topic.tags[0] ?? "Topic";
     return toTitleCase(raw);
-  }, []);
+  }, [suggestionTags]);
 
   const topicTagTitle = useCallback((topic: Topic) => {
-    const matched = SUGGESTION_TAGS.find((tag) => matchesSuggestionTag(topic, tag));
-    return toTitleCase(matched ?? topic.tags[0] ?? "Topic");
-  }, []);
+    if (topic.id.startsWith("custom-")) return "Yours";
+    const matchedSelectedTag = suggestionTags.find((tag) => topic.tags.includes(tag));
+    return toTitleCase(matchedSelectedTag ?? topic.tags[0] ?? "Topic");
+  }, [suggestionTags]);
 
   const cancelTimers = () => {
     if (spinTimeoutRef.current !== null) {

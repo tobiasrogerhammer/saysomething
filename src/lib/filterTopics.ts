@@ -17,7 +17,7 @@ export type SuggestionTag = (typeof SUGGESTION_TAGS)[number];
 
 export type TopicFilters = {
   safeMode: boolean;
-  depthLevel: 1 | 2 | 3;
+  depthLevels: Array<1 | 2 | 3>;
   suggestionTags?: SuggestionTag[];
 };
 
@@ -27,12 +27,12 @@ export function filterTopics(topics: Topic[], filters: TopicFilters): Topic[] {
       return false;
     }
 
-    if (topic.depthLevel !== filters.depthLevel) {
+    if (!filters.depthLevels.includes(topic.depthLevel)) {
       return false;
     }
 
     if (filters.suggestionTags && filters.suggestionTags.length > 0) {
-      return filters.suggestionTags.some((suggestionTag) => matchesSuggestionTag(topic, suggestionTag));
+      return filters.suggestionTags.some((suggestionTag) => topic.tags.includes(suggestionTag as TopicTag));
     }
 
     return true;

@@ -34,12 +34,66 @@ function topicsMatchingTags(pool: Topic[], tags: SuggestionTag[]): Topic[] {
   return out;
 }
 
+function pickEvenlyAcrossTags(pool: Topic[], tags: SuggestionTag[], random: RandomFn): Topic[] {
+  const matched = topicsMatchingTags(pool, tags);
+  const uniqueTags = Array.from(new Set(tags));
+  const target = Math.min(BASE_WHEEL_MAX, matched.length);
+  const tagOrder = shuffle(uniqueTags, random);
+  const remainderTags = new Set(tagOrder.slice(0, target % tagOrder.length));
+  const basePerTag = Math.floor(target / tagOrder.length);
+
+  const buckets = new Map<SuggestionTag, Topic[]>(
+    tagOrder.map((tag) => [tag, shuffle(matched.filter((topic) => topic.tags.includes(tag)), random)]),
+  );
+
+  const selected: Topic[] = [];
+  const selectedIds = new Set<string>();
+  const quotaRemaining = new Map<SuggestionTag, number>(
+    tagOrder.map((tag) => [tag, basePerTag + (remainderTags.has(tag) ? 1 : 0)]),
+  );
+
+  // Round-robin pick: take at most one per selected tag each pass, so slices alternate by tag.
+  while (selected.length < target) {
+    let madeProgress = false;
+    for (const tag of tagOrder) {
+      if (selected.length >= target) break;
+      const left = quotaRemaining.get(tag) ?? 0;
+      if (left <= 0) continue;
+      const bucket = buckets.get(tag) ?? [];
+      while (bucket.length > 0 && selectedIds.has(bucket[0]!.id)) {
+        bucket.shift();
+      }
+      const next = bucket.shift();
+      if (!next) continue;
+      selected.push(next);
+      selectedIds.add(next.id);
+      quotaRemaining.set(tag, left - 1);
+      madeProgress = true;
+    }
+    if (!madeProgress) break;
+  }
+
+  if (selected.length < target) {
+    const fallback = shuffle(matched, random);
+    for (const topic of fallback) {
+      if (selected.length >= target) break;
+      if (selectedIds.has(topic.id)) continue;
+      selected.push(topic);
+      selectedIds.add(topic.id);
+    }
+  }
+
+  return selected;
+}
+
 export function isPersonalWheelTopic(topic: Topic): boolean {
   return topic.id.startsWith("custom-");
 }
 
 /**
- * Default wheel only (no `custom-` topics): up to 8 slices — tag matches capped at 8, then padded to 8 from pool.
+ * Default wheel only (no `custom-` topics): up to 8 slices.
+ * - No tag filter: diverse random picks from full filtered pool.
+ * - Tag filter active: picks only from matched-tag pool (no non-tag padding).
  */
 export function buildInitialWheelTopics(pool: Topic[], suggestionTags: SuggestionTag[], random: RandomFn): Topic[] {
   if (pool.length === 0) return [];
@@ -47,33 +101,7 @@ export function buildInitialWheelTopics(pool: Topic[], suggestionTags: Suggestio
   if (suggestionTags.length === 0) {
     selected = pickDiverseRandomTopics(pool, Math.min(TARGET_MIN, pool.length), random);
   } else {
-    const matched = topicsMatchingTags(pool, suggestionTags);
-    selected =
-      matched.length <= BASE_WHEEL_MAX
-        ? [...matched]
-        : pickDiverseRandomTopics(matched, BASE_WHEEL_MAX, random);
-    const onWheel = new Set(selected.map((t) => t.id));
-    const padSource = shuffle(
-      pool.filter((t) => !onWheel.has(t.id)),
-      random,
-    );
-    while (selected.length < TARGET_MIN && padSource.length > 0) {
-      const next = padSource.pop();
-      if (next && !onWheel.has(next.id)) {
-        selected.push(next);
-        onWheel.add(next.id);
-      } else {
-        break;
-      }
-    }
-    if (selected.length < TARGET_MIN) {
-      const filler = shuffle(pool, random).filter((t) => !onWheel.has(t.id));
-      for (const t of filler) {
-        if (selected.length >= TARGET_MIN) break;
-        selected.push(t);
-        onWheel.add(t.id);
-      }
-    }
+    selected = pickEvenlyAcrossTags(pool, suggestionTags, random);
   }
   return selected.slice(0, BASE_WHEEL_MAX);
 }

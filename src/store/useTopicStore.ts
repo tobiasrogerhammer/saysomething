@@ -16,7 +16,7 @@ export type GameKey = (typeof gameKeys)[number];
 
 type TopicStore = {
   safeMode: boolean;
-  depthLevel: 1 | 2 | 3;
+  depthLevels: Array<1 | 2 | 3>;
   suggestionTags: SuggestionTag[];
   selectedGame: GameKey;
   /** When set, mini-games draw only this custom topic (still shown in Game mode menu). */
@@ -25,7 +25,7 @@ type TopicStore = {
   lastTopic: Topic | null;
   history: Topic[];
   setSafeMode: (value: boolean) => void;
-  setDepthLevel: (value: 1 | 2 | 3) => void;
+  toggleDepthLevel: (value: 1 | 2 | 3) => void;
   toggleSuggestionTag: (value: SuggestionTag) => void;
   clearSuggestionTags: () => void;
   setSelectedGame: (value: GameKey) => void;
@@ -37,7 +37,7 @@ type TopicStore = {
 
 export const useTopicStore = create<TopicStore>((set) => ({
   safeMode: true,
-  depthLevel: 1,
+  depthLevels: [1],
   suggestionTags: [],
   selectedGame: "spin-wheel",
   focusedPersonalTopicId: null,
@@ -45,7 +45,15 @@ export const useTopicStore = create<TopicStore>((set) => ({
   lastTopic: null,
   history: [],
   setSafeMode: (value) => set({ safeMode: value }),
-  setDepthLevel: (value) => set({ depthLevel: value }),
+  toggleDepthLevel: (value) =>
+    set((state) => {
+      const hasValue = state.depthLevels.includes(value);
+      if (hasValue) {
+        if (state.depthLevels.length === 1) return {};
+        return { depthLevels: state.depthLevels.filter((entry) => entry !== value) };
+      }
+      return { depthLevels: [...state.depthLevels, value].sort((a, b) => a - b) as Array<1 | 2 | 3> };
+    }),
   toggleSuggestionTag: (value) =>
     set((state) => ({
       suggestionTags: state.suggestionTags.includes(value)

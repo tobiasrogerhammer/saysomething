@@ -25,11 +25,7 @@ const depthSelectedDisplay: Record<1 | 2 | 3, string> = {
   3: "Meaningful",
 };
 
-const depthBlurbs: Record<1 | 2 | 3, string> = {
-  1: "Small talk — icebreakers to get a conversation started.",
-    2: "Personal — get to know each other better.",
-    3: "Meaningful — are you colleagues or friends?",
-};
+const depthLevels: Array<1 | 2 | 3> = [1, 2, 3];
 
 const tagColorClasses = [
   "bg-rose-500 text-white hover:bg-rose-600",
@@ -54,8 +50,8 @@ type GameSettingsPanelProps = {
   showHeading: boolean;
   safeMode: boolean;
   setSafeMode: (value: boolean) => void;
-  depthLevel: 1 | 2 | 3;
-  setDepthLevel: (value: 1 | 2 | 3) => void;
+  depthLevelsSelected: Array<1 | 2 | 3>;
+  toggleDepthLevel: (value: 1 | 2 | 3) => void;
   newTopicText: string;
   setNewTopicText: (value: string) => void;
   onSubmitTopic: (event: FormEvent<HTMLFormElement>) => void;
@@ -63,6 +59,7 @@ type GameSettingsPanelProps = {
   suggestionTags: SuggestionTag[];
   toggleSuggestionTag: (tag: SuggestionTag) => void;
   clearSuggestionTags: () => void;
+  matchedDefaultTagTopicsCount: number;
   customTopics: Topic[];
   removePersonalTopic: (topicId: string) => void;
 };
@@ -71,8 +68,8 @@ function GameSettingsPanel({
   showHeading,
   safeMode,
   setSafeMode,
-  depthLevel,
-  setDepthLevel,
+  depthLevelsSelected,
+  toggleDepthLevel,
   newTopicText,
   setNewTopicText,
   onSubmitTopic,
@@ -80,6 +77,7 @@ function GameSettingsPanel({
   suggestionTags,
   toggleSuggestionTag,
   clearSuggestionTags,
+  matchedDefaultTagTopicsCount,
   customTopics,
   removePersonalTopic,
 }: GameSettingsPanelProps) {
@@ -87,7 +85,7 @@ function GameSettingsPanel({
     <div className="space-y-4 text-slate-800 sm:space-y-5">
       <div className="space-y-2">
         {showHeading ? (
-          <p className="text-xs font-semibold tracking-wider text-violet-950 uppercase">Game settings</p>
+          <p className="text-sm font-semibold tracking-wider text-violet-950 uppercase">Game settings</p>
         ) : null}
         <div className="space-y-3">
           <div className="space-y-1.5">
@@ -107,20 +105,31 @@ function GameSettingsPanel({
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex flex-row items-center justify-between gap-2 sm:gap-3">
-              <span className="shrink-0 text-sm font-semibold whitespace-nowrap text-violet-950">Depth</span>
-              <Select value={String(depthLevel)} onValueChange={(value) => setDepthLevel(Number(value) as 1 | 2 | 3)}>
-                <SelectTrigger className="h-11 min-h-11 w-32 shrink-0 touch-manipulation border-fuchsia-200/50 bg-white/90 text-slate-900 sm:h-9 sm:min-h-0">
-                  <span className="truncate">{depthSelectedDisplay[depthLevel]}</span>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Small talk</SelectItem>
-                  <SelectItem value="2">Personal</SelectItem>
-                  <SelectItem value="3">Meaningful</SelectItem>
-                </SelectContent>
-              </Select>
+            <span className="text-sm font-semibold text-violet-950">Depth level</span>
+            <div className="flex flex-nowrap gap-1.5">
+              {depthLevels.map((level) => {
+                const active = depthLevelsSelected.includes(level);
+                return (
+                  <Button
+                    key={level}
+                    type="button"
+                    size="sm"
+                    variant={active ? "default" : "outline"}
+                    className={cn(
+                      "h-9 min-w-0 flex-1 touch-manipulation text-xs",
+                      active ? "bg-violet-700 text-white hover:bg-violet-800" : "border-fuchsia-200/70 bg-white/80 text-slate-800",
+                    )}
+                    onClick={() => toggleDepthLevel(level)}
+                    disabled={spinSettingsLocked}
+                  >
+                    {depthSelectedDisplay[level]}
+                  </Button>
+                );
+              })}
             </div>
-            <p className="text-xs leading-snug text-slate-600">{depthBlurbs[depthLevel]}</p>
+            <p className="text-xs leading-snug text-slate-600">
+              {depthLevelsSelected.map((level) => depthSelectedDisplay[level]).join(", ")} depth levels currently selected
+            </p>
           </div>
         </div>
       </div>
@@ -175,57 +184,65 @@ function GameSettingsPanel({
           ) : (
             <span className="text-sm font-semibold text-violet-800/80">None</span>
           )}
-          <Popover>
-            <PopoverTrigger
-              disabled={spinSettingsLocked}
-              className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-fuchsia-200/70 bg-white/80 px-3.5 text-sm font-medium text-slate-800 shadow-none transition-colors hover:border-fuchsia-300/80 hover:bg-white disabled:pointer-events-none disabled:opacity-40 sm:min-h-8 sm:w-auto sm:text-xs"
-            >
-              + Add tags
-            </PopoverTrigger>
-            <PopoverContent
-              className="w-[min(calc(100vw-1.5rem),20rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-none sm:w-80"
-              align="center"
-              sideOffset={6}
-            >
-              <PopoverHeader>
-                <PopoverTitle className="text-base font-semibold text-violet-950">Choose tags</PopoverTitle>
-              </PopoverHeader>
-              <div className="flex flex-wrap gap-2">
-                {SUGGESTION_TAGS.map((tag) => {
-                  const active = suggestionTags.includes(tag);
-                  const colorClass = tagColorClasses[SUGGESTION_TAGS.indexOf(tag) % tagColorClasses.length];
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      disabled={spinSettingsLocked}
-                      onClick={() => toggleSuggestionTag(tag as SuggestionTag)}
-                      className={`rounded-full px-3 py-1 text-xs font-medium transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-40 ${
-                        active
-                          ? `${colorClass} hover:opacity-90`
-                          : "border border-fuchsia-200/60 bg-white/80 text-slate-800 hover:bg-white"
-                      }`}
-                    >
-                      {toTitleCase(tag)}
-                    </button>
-                  );
-                })}
-              </div>
-              {suggestionTags.length > 0 ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="self-start px-0 text-muted-foreground"
-                  disabled={spinSettingsLocked}
-                  onClick={() => clearSuggestionTags()}
-                >
-                  Clear all tags
-                </Button>
-              ) : null}
-            </PopoverContent>
-          </Popover>
         </div>
+        <Popover>
+          <PopoverTrigger
+            disabled={spinSettingsLocked}
+            className="inline-flex min-h-10 w-full items-center justify-center rounded-full border border-fuchsia-200/70 bg-white/80 px-3.5 text-sm font-medium text-slate-800 shadow-none transition-colors hover:border-fuchsia-300/80 hover:bg-white disabled:pointer-events-none disabled:opacity-40 sm:min-h-8 sm:w-auto sm:text-xs"
+          >
+            + Add tags
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-[min(calc(100vw-1.5rem),20rem)] max-w-[calc(100vw-1.5rem)] sm:max-w-none sm:w-80"
+            align="start"
+            side="bottom"
+            sideOffset={6}
+            collisionAvoidance={{ side: "none", align: "none", fallbackAxisSide: "none" }}
+          >
+            <PopoverHeader>
+              <PopoverTitle className="text-base font-semibold text-violet-950">Choose tags</PopoverTitle>
+            </PopoverHeader>
+            <div className="flex flex-wrap gap-2">
+              {SUGGESTION_TAGS.map((tag) => {
+                const active = suggestionTags.includes(tag);
+                const colorClass = tagColorClasses[SUGGESTION_TAGS.indexOf(tag) % tagColorClasses.length];
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    disabled={spinSettingsLocked}
+                    onClick={() => toggleSuggestionTag(tag as SuggestionTag)}
+                    className={`rounded-full px-3 py-1 text-xs font-medium transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-40 ${
+                      active
+                        ? `${colorClass} hover:opacity-90`
+                        : "border border-fuchsia-200/60 bg-white/80 text-slate-800 hover:bg-white"
+                    }`}
+                  >
+                    {toTitleCase(tag)}
+                  </button>
+                );
+              })}
+            </div>
+            {suggestionTags.length > 0 ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="self-start px-0 text-muted-foreground"
+                disabled={spinSettingsLocked}
+                onClick={() => clearSuggestionTags()}
+              >
+                Clear all tags
+              </Button>
+            ) : null}
+          </PopoverContent>
+        </Popover>
+        {suggestionTags.length > 0 && matchedDefaultTagTopicsCount < 8 ? (
+          <p className="rounded-md border border-amber-300/70 bg-amber-50/80 px-3 py-2 text-xs leading-relaxed text-amber-950/90">
+            Only {matchedDefaultTagTopicsCount} topic{matchedDefaultTagTopicsCount === 1 ? "" : "s"} match your selected tags with the
+            current safe mode and depth. Try adding more tags or changing safe mode/depth to fill more slices.
+          </p>
+        ) : null}
         {customTopics.length > 0 ? (
           <div className="space-y-1.5 border-t border-fuchsia-200/40 pt-2">
             <p className="text-xs font-medium text-violet-900/90">Personal topics</p>
@@ -265,11 +282,11 @@ export default function Home() {
   const [spinQuestion, setSpinQuestion] = useState<SpinWheelSpinQuestion | null>(null);
   const {
     safeMode,
-    depthLevel,
+    depthLevels: depthLevelsSelected,
     suggestionTags,
     lastTopic,
     setSafeMode,
-    setDepthLevel,
+    toggleDepthLevel,
     toggleSuggestionTag,
     clearSuggestionTags,
     clearSeenTopicIds,
@@ -277,14 +294,18 @@ export default function Home() {
   } = useTopicStore();
 
   const filters = useMemo(
-    () => ({ safeMode, depthLevel, suggestionTags }),
-    [safeMode, depthLevel, suggestionTags],
+    () => ({ safeMode, depthLevels: depthLevelsSelected, suggestionTags }),
+    [safeMode, depthLevelsSelected, suggestionTags],
   );
   const filteredPersonalTopics = useMemo(
-    () => filterTopics(customTopics, { safeMode, depthLevel }),
-    [customTopics, safeMode, depthLevel],
+    () => filterTopics(customTopics, { safeMode, depthLevels: depthLevelsSelected }),
+    [customTopics, safeMode, depthLevelsSelected],
   );
   const filteredDefaultTopics = useMemo(() => filterTopics(topics, filters), [filters]);
+  const matchedDefaultTagTopicsCount = useMemo(() => {
+    if (suggestionTags.length === 0) return 0;
+    return filteredDefaultTopics.filter((topic) => suggestionTags.some((tag) => topic.tags.includes(tag))).length;
+  }, [filteredDefaultTopics, suggestionTags]);
   /** Personal topics ignore tag filters so they always reach the wheel; defaults use full filters. */
   const spinWheelTopicPool = useMemo(() => {
     const seen = new Set<string>();
@@ -322,7 +343,7 @@ export default function Home() {
       id: `custom-${Date.now()}`,
       text,
       tags: ["storytelling"],
-      depthLevel,
+      depthLevel: depthLevelsSelected[0] ?? 1,
       safetyLevel: "safe",
     };
 
@@ -354,8 +375,12 @@ export default function Home() {
           <CardHeader className="border-b border-fuchsia-200/50 bg-linear-to-r from-fuchsia-50/90 via-white to-amber-50/80 px-3 pb-4 pt-4 sm:px-4 sm:pt-5">
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1 space-y-2">
-                <CardTitle className="bg-linear-to-r from-violet-950 via-violet-900 to-fuchsia-950 bg-clip-text text-2xl font-semibold text-transparent md:text-3xl">
-                  Say Something
+                <CardTitle className="max-w-full">
+                  <img
+                    src="/logo.png?v=2"
+                    alt="Say Something"
+                    className="h-auto w-[min(18rem,100%)] sm:w-[min(20rem,100%)]"
+                  />
                 </CardTitle>
                 <CardDescription className="text-violet-950/75">
                   Play a mini-game and pull a topic for your next meeting.
@@ -382,8 +407,8 @@ export default function Home() {
                     showHeading={false}
                     safeMode={safeMode}
                     setSafeMode={setSafeMode}
-                    depthLevel={depthLevel}
-                    setDepthLevel={setDepthLevel}
+                    depthLevelsSelected={depthLevelsSelected}
+                    toggleDepthLevel={toggleDepthLevel}
                     newTopicText={newTopicText}
                     setNewTopicText={setNewTopicText}
                     onSubmitTopic={submitConversationTopic}
@@ -391,6 +416,7 @@ export default function Home() {
                     suggestionTags={suggestionTags}
                     toggleSuggestionTag={toggleSuggestionTag}
                     clearSuggestionTags={clearSuggestionTags}
+                    matchedDefaultTagTopicsCount={matchedDefaultTagTopicsCount}
                     customTopics={customTopics}
                     removePersonalTopic={removePersonalTopic}
                   />
@@ -406,8 +432,8 @@ export default function Home() {
                   showHeading
                   safeMode={safeMode}
                   setSafeMode={setSafeMode}
-                  depthLevel={depthLevel}
-                  setDepthLevel={setDepthLevel}
+                  depthLevelsSelected={depthLevelsSelected}
+                  toggleDepthLevel={toggleDepthLevel}
                   newTopicText={newTopicText}
                   setNewTopicText={setNewTopicText}
                   onSubmitTopic={submitConversationTopic}
@@ -415,6 +441,7 @@ export default function Home() {
                   suggestionTags={suggestionTags}
                   toggleSuggestionTag={toggleSuggestionTag}
                   clearSuggestionTags={clearSuggestionTags}
+                  matchedDefaultTagTopicsCount={matchedDefaultTagTopicsCount}
                   customTopics={customTopics}
                   removePersonalTopic={removePersonalTopic}
                 />
