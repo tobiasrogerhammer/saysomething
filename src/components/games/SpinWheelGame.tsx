@@ -254,16 +254,16 @@ export function SpinWheelGame({
     onSessionReset?.();
   };
 
-  const wheelSize = 360;
+  const wheelSize = 390;
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col items-center gap-4 rounded-xl border border-fuchsia-100/90 bg-linear-to-b from-fuchsia-50/50 via-white to-violet-50/40 px-3 py-4 shadow-sm ring-1 ring-violet-100/60 sm:gap-6 sm:rounded-2xl sm:px-5 sm:py-6 md:px-6">
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-fuchsia-100/90 bg-linear-to-b from-fuchsia-50/50 via-white to-violet-50/40 px-3 py-4 shadow-sm ring-1 ring-violet-100/60 sm:gap-6 sm:rounded-2xl sm:px-5 sm:py-6 md:px-6">
       {header ? (
         <div className="w-full min-w-0 self-stretch border-b border-fuchsia-200/45">
           {header}
         </div>
       ) : null}
-      <div className="relative w-full min-w-0 max-w-[min(100%,520px)] px-0.5">
+      <div className="relative w-full min-w-0 max-w-[min(100%,580px)] px-0.5">
         <div className="pointer-events-none absolute top-0 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1 flex-col items-center">
           <div
             className="h-0 w-0 border-x-[14px] border-t-[22px] border-x-transparent border-t-fuchsia-950 drop-shadow-md"

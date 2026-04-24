@@ -4,7 +4,7 @@ import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Plus, Settings, X } from "lucide-react";
 import { SpinWheelGame, type SpinWheelSpinQuestion } from "@/components/games/SpinWheelGame";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverHeader, PopoverTitle, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -372,25 +372,21 @@ export default function Home() {
     <div className="min-h-screen bg-linear-to-br from-violet-100/90 via-fuchsia-50/95 to-amber-100/90 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-6 md:p-8">
       <main className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-4 sm:gap-6">
         <Card className="gap-0 py-0 border-2 border-fuchsia-200/70 bg-linear-to-br from-white via-fuchsia-50/40 to-amber-50/50 shadow-lg shadow-fuchsia-900/10 ring-1 ring-violet-200/50">
-          <CardHeader className="border-b border-fuchsia-200/50 bg-linear-to-r from-fuchsia-50/90 via-white to-amber-50/80 px-3 pb-4 pt-4 sm:px-4 sm:pt-5">
-            <div className="flex items-start gap-3">
-              <div className="min-w-0 flex-1 space-y-2">
-                <CardTitle className="max-w-full">
-                  <img
-                    src="/logo.png?v=2"
-                    alt="Say Something"
-                    className="h-auto w-[min(18rem,100%)] sm:w-[min(20rem,100%)]"
-                  />
-                </CardTitle>
-                <CardDescription className="text-violet-950/75">
-                  Play a mini-game and pull a topic for your next meeting.
-                </CardDescription>
+          <CardContent className="px-0 pt-0 sm:pb-8">
+            <div className="flex items-start justify-between gap-3 border-b border-fuchsia-200/50 px-3 pb-4 pt-3 sm:px-4 lg:hidden">
+              <div className="min-w-0 space-y-2">
+                <img
+                  src="/logo.png?v=2"
+                  alt="Say Something"
+                  className="h-auto w-[min(14rem,100%)]"
+                />
+                <p className="text-sm text-violet-950/75">Play a mini-game and pull a topic for your next meeting.</p>
               </div>
               <Sheet modal="trap-focus">
                 <SheetTrigger
                   className={cn(
                     buttonVariants({ variant: "outline", size: "icon-lg" }),
-                    "shrink-0 touch-manipulation lg:hidden",
+                    "shrink-0 touch-manipulation",
                   )}
                   aria-label="Open game settings"
                 >
@@ -423,11 +419,16 @@ export default function Home() {
                 </SheetContent>
               </Sheet>
             </div>
-          </CardHeader>
-
-          <CardContent className="px-0 pt-0 sm:pb-8">
             <div className="flex min-w-0 flex-col-reverse gap-5 px-3 sm:px-4 lg:grid lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-stretch lg:gap-0 lg:px-0">
               <aside className="hidden min-w-0 border-fuchsia-200/50 bg-linear-to-b from-fuchsia-50/45 via-white/50 to-violet-50/35 lg:block lg:max-w-[340px] lg:border-r lg:px-5 lg:py-6">
+                <div className="mb-5 space-y-2 border-b border-fuchsia-200/50 pb-4">
+                  <img
+                    src="/logo.png?v=2"
+                    alt="Say Something"
+                    className="h-auto w-[min(18rem,100%)]"
+                  />
+                  <p className="text-sm text-violet-950/75">Play a mini-game and pull a topic for your next meeting.</p>
+                </div>
                 <GameSettingsPanel
                   showHeading
                   safeMode={safeMode}
@@ -447,7 +448,7 @@ export default function Home() {
                 />
               </aside>
 
-              <section className="flex min-w-0 flex-col gap-4 px-0 sm:gap-6 lg:px-8 lg:py-6">
+              <section className="mt-3 flex min-w-0 flex-col gap-4 px-0 sm:mt-4 sm:gap-6 lg:mt-0 lg:px-8 lg:py-6">
                 {noTopicMatch ? (
                   <div className="space-y-3 rounded-xl border border-dashed border-violet-300/70 bg-violet-50/50 px-4 py-8 text-center text-base text-violet-950/80 sm:p-10 sm:text-sm">
                     <p>No topics match these filters. Try changing safe mode, depth, or tags in Game settings.</p>
@@ -466,12 +467,12 @@ export default function Home() {
                   <SpinWheelGame
                     header={
                       <>
-                        <p className="min-h-12 text-base font-semibold leading-relaxed text-violet-950 sm:text-lg">
+                        <p className="min-h-14 text-base font-semibold leading-relaxed text-violet-950 sm:min-h-16 sm:text-lg">
                           {lastTopic ? lastTopic.text : "Spin the wheel to reveal your next conversation topic."}
                         </p>
                         {spinQuestion &&
                         spinQuestion.text.trim() !== (lastTopic?.text ?? "").trim() ? (
-                          <p className="mt-4 border-t border-violet-200/60 pt-4 text-base font-semibold leading-relaxed text-violet-950 sm:text-lg">
+                          <p className="mt-4 min-h-16 border-t border-violet-200/60 pt-4 text-base font-semibold leading-relaxed text-violet-950 sm:min-h-20 sm:text-lg">
                             {spinQuestion.text}
                           </p>
                         ) : null}
