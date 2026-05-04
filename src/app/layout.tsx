@@ -4,6 +4,19 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Say Something",
   description: "Fun conversation topics, get to know your friends or colleagues better.",
+  openGraph: {
+    title: "Say Something",
+    description:
+      "Fun conversation topics, get to know your friends or colleagues better.",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Say Something" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Say Something",
+    description:
+      "Fun conversation topics, get to know your friends or colleagues better.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({
