@@ -1,59 +1,63 @@
 # Conversation Topic Picker
 
-A colorful mini-game web app for revealing random conversation prompts with configurable safety and depth filters.
+A fun web app for picking conversation topics through a spin wheel, with filters and optional custom topic sources.
 
-## Run locally
+## Live app
 
-```bash
-npm install
-npm run dev
-```
+Use the hosted version: [`https://huddly-saysomething.vercel.app/`](https://huddly-saysomething.vercel.app/)
 
-Open [http://localhost:3000](http://localhost:3000).
+## How to use
 
-## Project structure
+1. Open the app and look at the controls in **Game settings**.
+2. Either simply start by spinning the wheel, or by selecting some filters for topics.
+   - **Safe mode** (avoids topics that might include brand-names, politics, or other sensitive information)
+   - **Depth level** (Small talk / Personal / Meaningful)
+   - **Tags** (optional)
+3. (Optional) Add custom topics:
+   - Click **Import topics**
+   - Choose a `.json` / `.txt` file, or paste topics into the textbox and click **Save**
+   - Use **Clear** to remove pasted topics
+4. Click **Spin the wheel** to reveal the next topic.
+5. Click **Spin again** to keep going, and **Reset game** to start a fresh round.
 
-```txt
-src/
-  app/
-  components/
-    games/
-    ui/
-  data/
-    topics.ts
-  lib/
-    filterTopics.ts
-  store/
-    useTopicStore.ts
-```
+## Import formats
 
-## How it works
+The importer supports both **JSON** and **TXT**.
 
-- `src/data/topics.ts`: Topic model and 60+ topic entries.
-- `src/lib/filterTopics.ts`: Safe mode, duration, and depth filtering plus random helper utilities.
-- `src/store/useTopicStore.ts`: Zustand global state for filters, selected mini-game, seen IDs, latest topic, and history.
-- `src/components/games/*`: Isolated mini-game components implementing the same `MiniGameProps` interface.
-- `src/app/page.tsx`: Main UI, filters, game selector, reveal card, clipboard action, and topic history drawer.
+### JSON
 
-## Add a new mini-game
+You can import any of the following:
 
-1. Create a new component in `src/components/games/`.
-2. Implement the shared game contract from `src/components/games/types.ts`:
-   - `topics: Topic[]`
-   - `onResult: (topic: Topic) => void`
-3. Add it to `GameHost` in `src/components/games/GameHost.tsx`.
-4. Register its key/label in `src/store/useTopicStore.ts` and in the selector mapping in `src/app/page.tsx`.
+- An array of strings
+- An array of topic objects
+- An object with a `topics` array
 
-## Add new topics safely
+Topic object fields:
 
-In `src/data/topics.ts`, each topic must include:
+- `id` (optional)
+- `text` (required)
+- `tags` (optional; defaults to `["custom"]`)
+- `depthLevel` (`1 | 2 | 3`; optional; defaults to `1`)
+- `safetyLevel` (`"safe" | "normal"`; optional; defaults to `"safe"`)
 
-- `id`: unique string
-- `text`: prompt shown to the user
-- `tags`: array of topic tags (`light`, `deep`, `personal`, `creative`, `reflective`, `political`, `commercial`, `sensitive`)
-- `duration`: `short | medium | long`
-- `depthLevel`: `1 | 2 | 3`
+### TXT
 
-Safe mode is enabled by default and hides topics tagged with `political`, `commercial`, or `sensitive`.
+- One topic per non-empty line.
 
-For contributor details, see `CONTRIBUTING.md`.
+## Tech overview (how it works)
+
+This is a client-side Next.js app (React + TypeScript). Key pieces:
+
+- `src/data/topics.ts`: default topic dataset and types.
+- `src/lib/filterTopics.ts`: safe mode / depth / tag filtering helpers.
+- `src/lib/buildWheelTopicList.ts`: selects a slice set for the wheel based on tags and ensures a diverse set of topics.
+- `src/components/games/spin-wheel/*`: SVG wheel rendering and spin rotation math.
+- `src/store/useTopicStore.ts`: Zustand store for UI state (safe mode, selected tags, last topic, history, etc.).
+- `src/app/page.tsx`: the import modal + paste parsing + wiring the selected topic into the active mini-game.
+
+Custom topic sources (imported file and saved pasted topics) are parsed and merged in the browser, then persisted in `localStorage` so your setup survives refresh.
+
+## Notes
+
+- When a round is active, filter controls are locked until reset.
+- If no topics match current filters, the UI offers quick-fix actions (enable more depth, clear tags, turn off safe mode).

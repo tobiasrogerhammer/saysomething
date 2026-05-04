@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Conversation Topic Picker",
-  description: "A colorful set of mini-games for revealing random conversation topics.",
+  title: "Say Something",
+  description: "Fun conversation topics, get to know your friends or colleagues better.",
 };
 
 export default function RootLayout({

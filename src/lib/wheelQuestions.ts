@@ -1,4 +1,4 @@
-import type { Topic, TopicTag } from "@/data/topics";
+import type { Topic, TopicTag } from "@/allTopics/topics";
 
 const MIN_BANK = 3;
 

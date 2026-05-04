@@ -1,6 +1,6 @@
 "use client";
 
-import type { Topic } from "@/data/topics";
+import type { Topic } from "@/allTopics/topics";
 import { pieSlicePath, polarFromTopCw } from "./svgWheelGeometry";
 
 type WheelSliceProps = {
@@ -28,7 +28,7 @@ export function WheelSlice({ topic, startDeg, endDeg, fill, cx, cy, radius, labe
         x={x}
         y={y}
         fill="white"
-        fontSize={11}
+        fontSize={13}
         fontWeight={700}
         textAnchor="middle"
         dominantBaseline="middle"

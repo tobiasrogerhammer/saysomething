@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useMemo } from "react";
-import type { Topic } from "@/data/topics";
+import type { Topic } from "@/allTopics/topics";
 import { WHEEL_SLICE_COLORS } from "./wheelColors";
 import { WheelSlice } from "./WheelSlice";
 

@@ -13,7 +13,9 @@ export const TOPIC_TAGS = [
   "creativity",
 ] as const;
 
-export type TopicTag = (typeof TOPIC_TAGS)[number];
+export type DefaultTopicTag = (typeof TOPIC_TAGS)[number];
+/** Allows default tags plus user-provided tags from uploaded topic files. */
+export type TopicTag = DefaultTopicTag | (string & {});
 
 export type Topic = {
   id: string;

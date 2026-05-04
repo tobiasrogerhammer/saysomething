@@ -16,7 +16,11 @@ export function computeRotationToLandOnIndex(
   minExtraFullTurnsDeg = 1800,
 ): number {
   if (sliceCount <= 0) return currentRotationDeg;
-  if (sliceCount === 1) return currentRotationDeg;
+  if (sliceCount === 1) {
+    // Single slice should still visibly spin before revealing.
+    const extra = minExtraFullTurnsDeg + Math.floor(Math.random() * 1440);
+    return currentRotationDeg + extra;
+  }
   const step = 360 / sliceCount;
   const selectedAngle = selectedIndex * step + step / 2;
   const extra = minExtraFullTurnsDeg + Math.floor(Math.random() * 1440);

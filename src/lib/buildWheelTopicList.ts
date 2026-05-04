@@ -1,4 +1,4 @@
-import type { Topic } from "@/data/topics";
+import type { Topic } from "@/allTopics/topics";
 import type { SuggestionTag } from "@/lib/filterTopics";
 import { pickDiverseRandomTopics } from "@/lib/filterTopics";
 

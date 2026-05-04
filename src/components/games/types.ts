@@ -1,4 +1,4 @@
-import type { Topic } from "@/data/topics";
+import type { Topic } from "@/allTopics/topics";
 
 export interface MiniGameProps {
   topics: Topic[];

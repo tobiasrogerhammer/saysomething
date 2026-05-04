@@ -1,5 +1,5 @@
-import type { Topic, TopicTag } from "@/data/topics";
-export const SUGGESTION_TAGS = [
+import type { Topic, TopicTag } from "@/allTopics/topics";
+export const DEFAULT_SUGGESTION_TAGS = [
   "sports",
   "hobbies",
   "goals",
@@ -13,7 +13,7 @@ export const SUGGESTION_TAGS = [
   "relationships",
   "creativity",
 ] as const;
-export type SuggestionTag = (typeof SUGGESTION_TAGS)[number];
+export type SuggestionTag = string;
 
 export type TopicFilters = {
   safeMode: boolean;
@@ -44,7 +44,7 @@ export function matchesSuggestionTag(topic: Topic, suggestionTag: SuggestionTag)
     return true;
   }
   const text = topic.text.toLowerCase();
-  const checks: Record<SuggestionTag, string[]> = {
+  const checks: Record<(typeof DEFAULT_SUGGESTION_TAGS)[number], string[]> = {
     sports: ["sport", "game", "play", "team"],
     hobbies: ["hobby", "activity", "ritual", "skill", "book"],
     goals: ["goal", "success", "habit", "improve", "pursu"],
@@ -59,7 +59,11 @@ export function matchesSuggestionTag(topic: Topic, suggestionTag: SuggestionTag)
     creativity: ["creative", "design", "fictional", "world", "soundtrack", "character"],
   };
 
-  return checks[suggestionTag].some((keyword) => text.includes(keyword));
+  if (!(suggestionTag in checks)) {
+    return false;
+  }
+
+  return checks[suggestionTag as keyof typeof checks].some((keyword) => text.includes(keyword));
 }
 
 export function getPlayableTopics(topics: Topic[], seenTopicIds: Set<string>): Topic[] {

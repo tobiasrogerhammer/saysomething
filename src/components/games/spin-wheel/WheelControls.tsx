@@ -1,5 +1,6 @@
 "use client";
 
+import { RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type WheelControlsProps = {
@@ -37,7 +38,10 @@ export function WheelControls({ phase, sliceCount, onSpin, onReset }: WheelContr
         className="min-h-11 w-full touch-manipulation border-violet-200 bg-violet-50/90 text-base text-violet-900 hover:bg-violet-100 sm:min-h-10 sm:w-auto sm:text-sm"
         onClick={onReset}
       >
-        Reset game
+        <span className="inline-flex items-center gap-1.5">
+          <RefreshCcw className="size-4" aria-hidden />
+          <span>Reset game</span>
+        </span>
       </Button>
     </div>
   );

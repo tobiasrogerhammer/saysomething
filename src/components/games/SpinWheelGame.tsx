@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Topic } from "@/data/topics";
+import type { Topic } from "@/allTopics/topics";
 import { buildInitialWheelTopics, mergePersonalTopicsOntoWheel } from "@/lib/buildWheelTopicList";
 import { launchSpinConfetti } from "@/lib/launchSpinConfetti";
 import type { SuggestionTag } from "@/lib/filterTopics";
@@ -99,22 +99,30 @@ export function SpinWheelGame({
 
   useEffect(() => {
     if (gameStarted) return;
-    if (topicPool.length === 0) {
-      setWheelTopics([]);
-      setVisualSegments([]);
-      return;
-    }
-    const next = buildWheelFromPool(topicPool, suggestionTags, Math.random);
-    setWheelTopics(next);
-    setVisualSegments(uniformSegments(next));
-  }, [gameStarted, stablePoolKey, stableTagsKey, topicPool.length, suggestionTags]);
+    const syncWheelState = () => {
+      if (topicPool.length === 0) {
+        setWheelTopics([]);
+        setVisualSegments([]);
+        return;
+      }
+      const next = buildWheelFromPool(topicPool, suggestionTags, Math.random);
+      setWheelTopics(next);
+      setVisualSegments(uniformSegments(next));
+    };
+    const timeoutId = window.setTimeout(syncWheelState, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [gameStarted, stablePoolKey, stableTagsKey, topicPool, suggestionTags]);
 
   useEffect(() => {
-    if (wheelTopics.length === 0) {
-      setVisualSegments([]);
-      return;
-    }
-    setVisualSegments(uniformSegments(wheelTopics));
+    const syncSegments = () => {
+      if (wheelTopics.length === 0) {
+        setVisualSegments([]);
+        return;
+      }
+      setVisualSegments(uniformSegments(wheelTopics));
+    };
+    const timeoutId = window.setTimeout(syncSegments, 0);
+    return () => window.clearTimeout(timeoutId);
   }, [wheelTopics]);
 
   const labelForTopic = useCallback((topic: Topic) => {
@@ -144,9 +152,12 @@ export function SpinWheelGame({
 
   const runRedistributeThenSpin = (afterTopics: Topic[], fromSegs: SpinWheelSegment[], toSegs: SpinWheelSegment[]) => {
     setPhase("redistributing");
-    const start = performance.now();
+    let start: number | null = null;
     const duration = 700;
     const tick = (now: number) => {
+      if (start === null) {
+        start = now;
+      }
       const t = Math.min(1, (now - start) / duration);
       const eased = 1 - (1 - t) ** 3;
       setVisualSegments(lerpSegments(fromSegs, toSegs, eased));
