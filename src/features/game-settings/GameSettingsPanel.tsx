@@ -246,7 +246,7 @@ export function GameSettingsPanel({
 
                 <form className="space-y-2" onSubmit={submitBulkTopics}>
                   <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold tracking-wider text-violet-950 uppercase">Paste topics</p>
+                    <p className="text-xs font-semibold tracking-wider text-violet-950 uppercase">Input topics</p>
                     <div className="flex items-center gap-1.5">
                       <Button
                         type="submit"
@@ -271,7 +271,7 @@ export function GameSettingsPanel({
                   <textarea
                     value={pastedTopicsDraft}
                     onChange={(event) => onPastedTopicsDraftChange(event.target.value)}
-                    placeholder={"Paste one topic per line...\nWhat project are you most excited about this quarter?\nWhat helps you recharge after a busy week?"}
+                    placeholder={"Input one topic per line...\nWhat project are you most excited about this quarter?\nWhat helps you recharge after a busy week?"}
                     className="min-h-56 w-full rounded-md border border-fuchsia-200/60 bg-white/90 px-3 py-2 text-sm text-slate-900"
                   />
                   {pasteImportError ? <p className="text-xs leading-snug text-rose-700">{pasteImportError}</p> : null}
