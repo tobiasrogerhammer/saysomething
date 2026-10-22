@@ -28,7 +28,7 @@ export function WheelSlice({ topic, startDeg, endDeg, fill, cx, cy, radius, labe
         x={x}
         y={y}
         fill="white"
-        fontSize={13}
+        fontSize={17}
         fontWeight={700}
         textAnchor="middle"
         dominantBaseline="middle"

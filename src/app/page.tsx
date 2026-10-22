@@ -154,16 +154,16 @@ export default function Home() {
   const noTopicMatch = spinWheelTopicPool.length === 0;
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-violet-100/90 via-fuchsia-50/95 to-amber-100/90 px-3 pb-8 pt-4 sm:px-4 sm:pb-10 sm:pt-6 md:p-8">
-      <main className="mx-auto flex w-full min-w-0 max-w-6xl flex-col gap-4 sm:gap-6">
-        <Card className="gap-0 py-0 border-2 border-fuchsia-200/70 bg-linear-to-br from-white via-fuchsia-50/40 to-amber-50/50 shadow-lg shadow-fuchsia-900/10 ring-1 ring-violet-200/50">
-          <CardContent className="px-0 pt-0 sm:pb-8">
-            <div className="flex items-start justify-between gap-3 border-b border-fuchsia-200/50 px-3 pb-4 pt-3 sm:px-4 lg:hidden">
+    <div className="h-dvh overflow-hidden bg-linear-to-br from-violet-100/90 via-fuchsia-50/95 to-amber-100/90 p-2 sm:p-4 md:p-6">
+      <main className="mx-auto flex h-full w-full min-w-0 max-w-6xl flex-col">
+        <Card className="min-h-0 flex-1 gap-0 py-0 border-2 border-fuchsia-200/70 bg-linear-to-br from-white via-fuchsia-50/40 to-amber-50/50 shadow-lg shadow-fuchsia-900/10 ring-1 ring-violet-200/50">
+          <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+            <div className="flex items-start justify-between gap-3 shrink-0 border-b border-fuchsia-200/50 px-3 pb-2 pt-2 sm:px-4 lg:hidden">
               <div className="min-w-0 space-y-2">
                 <img
                   src="/logo.png?v=2"
                   alt="Say Something"
-                  className="h-auto w-[min(14rem,100%)]"
+                  className="h-auto max-h-12 w-auto max-w-[min(14rem,100%)]"
                 />
               </div>
               <Sheet modal="trap-focus">
@@ -215,17 +215,17 @@ export default function Home() {
                 </SheetContent>
               </Sheet>
             </div>
-            <div className="flex min-w-0 flex-col-reverse gap-5 px-3 sm:px-4 lg:grid lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-stretch lg:gap-0 lg:px-0">
-              <aside className="hidden min-w-0 border-fuchsia-200/50 bg-linear-to-b from-fuchsia-50/45 via-white/50 to-violet-50/35 lg:block lg:max-w-[340px] lg:border-r lg:px-5 lg:py-6">
-                <div className="mb-5 space-y-2 border-b border-fuchsia-200/50 pb-4">
+            <div className="flex min-h-0 min-w-0 flex-1 flex-col px-3 sm:px-4 lg:grid lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)] lg:grid-rows-[minmax(0,1fr)] lg:gap-0 lg:px-0">
+              <aside className="hidden min-h-0 min-w-0 lg:overflow-y-auto border-fuchsia-200/50 bg-white/40 lg:block lg:max-w-[380px] lg:border-r lg:px-5 lg:py-3">
+                <div className="mb-3 border-b border-fuchsia-200/50 pb-2">
                   <img
                     src="/logo.png?v=2"
                     alt="Say Something"
-                    className="h-auto w-[min(18rem,100%)]"
+                    className="h-auto w-[min(11rem,100%)]"
                   />
                 </div>
                 <GameSettingsPanel
-                  showHeading
+                  showHeading={false}
                   safeMode={safeMode}
                   setSafeMode={setSafeMode}
                   depthLevelsSelected={depthLevelsSelected}
@@ -255,9 +255,9 @@ export default function Home() {
                 />
               </aside>
 
-              <section className="mt-3 flex min-w-0 flex-col gap-4 px-0 sm:mt-4 sm:gap-6 lg:mt-0 lg:px-8 lg:py-6">
+              <section className="flex min-h-0 min-w-0 flex-1 flex-col gap-3 px-0 py-2 sm:py-3 lg:px-8 lg:py-5">
                 {noTopicMatch ? (
-                  <div className="space-y-3 rounded-xl border border-dashed border-violet-300/70 bg-violet-50/50 px-4 py-8 text-center text-base text-violet-950/80 sm:p-10 sm:text-sm">
+                  <div className="space-y-3 rounded-xl border border-dashed border-violet-300/70 bg-violet-50/50 px-4 py-8 text-center text-base text-violet-950/80 sm:p-10 sm:text-base">
                     <p>No topics match these filters. Try changing safe mode, depth, or tags in Game settings.</p>
                     <div className="flex flex-wrap justify-center gap-2">
                       <Button type="button" variant="outline" onClick={enableMoreDepth}>
@@ -272,7 +272,7 @@ export default function Home() {
                       <Button
                         type="button"
                         variant="secondary"
-                        className="min-h-11 min-w-32 touch-manipulation border-fuchsia-200 bg-white text-base text-fuchsia-900 hover:bg-fuchsia-50 sm:min-h-10 sm:text-sm"
+                        className="min-h-11 min-w-32 touch-manipulation border-fuchsia-200 bg-white text-base text-fuchsia-900 hover:bg-fuchsia-50 sm:min-h-10 sm:text-base"
                         onClick={handleResetGame}
                       >
                         Reset
@@ -283,13 +283,13 @@ export default function Home() {
                   <SpinWheelGame
                     header={
                       <>
-                        <p className="min-h-14 text-base font-semibold leading-relaxed text-violet-950 sm:min-h-16 sm:text-lg">
+                        <p className="line-clamp-2 text-xl font-bold leading-snug text-violet-950 sm:text-2xl">
                           {lastTopic ? lastTopic.text : "Spin the wheel to reveal your next conversation topic."}
                         </p>
                         {!noTopicMatch &&
                         spinQuestion &&
                         spinQuestion.text.trim() !== (lastTopic?.text ?? "").trim() ? (
-                          <p className="mt-4 min-h-16 border-t border-violet-200/60 pt-4 text-base font-semibold leading-relaxed text-violet-950 sm:min-h-20 sm:text-lg">
+                          <p className="mt-2 line-clamp-2 text-lg font-semibold leading-snug text-violet-800 sm:text-xl">
                             {spinQuestion.text}
                           </p>
                         ) : null}

@@ -1,5 +1,18 @@
 import type { Metadata } from "next";
+import { Figtree, Nunito } from "next/font/google";
 import "./globals.css";
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Say Something",
@@ -25,7 +38,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`${figtree.variable} ${nunito.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-linear-to-b from-violet-100/40 via-fuchsia-50/30 to-amber-100/50">{children}</body>
     </html>
   );

@@ -41,7 +41,8 @@ export function SpinWheel({ size, segments, rotationDeg, transitionMs, spinning,
       <svg
         viewBox={`0 0 ${size} ${size}`}
         preserveAspectRatio="xMidYMid meet"
-        className="mx-auto aspect-square w-full max-w-[min(100vw-1.5rem,390px)] shrink-0 drop-shadow-xl sm:max-w-[min(100%,520px)]"
+        className="aspect-square shrink-0 drop-shadow-xl transition-[width] duration-300 ease-out"
+        style={{ width: "min(100cqw, calc(100cqh - 1rem))" }}
         role="img"
         aria-label="Empty wheel"
       >
@@ -54,7 +55,8 @@ export function SpinWheel({ size, segments, rotationDeg, transitionMs, spinning,
     <svg
       viewBox={`0 0 ${size} ${size}`}
       preserveAspectRatio="xMidYMid meet"
-      className="mx-auto aspect-square w-full max-w-[min(100vw-1.5rem,390px)] shrink-0 drop-shadow-xl sm:max-w-[min(100%,520px)]"
+      className="aspect-square shrink-0 drop-shadow-xl transition-[width] duration-300 ease-out"
+        style={{ width: "min(100cqw, calc(100cqh - 1rem))" }}
       role="img"
       aria-label="Topic wheel"
     >

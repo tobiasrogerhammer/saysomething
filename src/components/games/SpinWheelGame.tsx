@@ -268,20 +268,20 @@ export function SpinWheelGame({
   const wheelSize = 390;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-fuchsia-100/90 bg-linear-to-b from-fuchsia-50/50 via-white to-violet-50/40 px-3 py-4 shadow-sm ring-1 ring-violet-100/60 sm:gap-6 sm:rounded-2xl sm:px-5 sm:py-6 md:px-6">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-4xl flex-col items-center justify-evenly gap-1 px-1 py-0 sm:gap-2 sm:px-2">
       {header ? (
-        <div className="w-full min-w-0 self-stretch border-b border-fuchsia-200/45">
+        <div className="max-h-[40%] w-full min-w-0 shrink-0 self-stretch overflow-y-auto text-center">
           {header}
         </div>
       ) : null}
-      <div className="relative w-full min-w-0 max-w-[min(100%,580px)] px-0.5">
-        <div className="pointer-events-none absolute top-0 left-1/2 z-10 flex -translate-x-1/2 -translate-y-1 flex-col items-center">
+      <div className="relative aspect-square min-h-0 w-full min-w-0 shrink [container-type:size] sm:max-w-[500px]">
+        <div className="pointer-events-none absolute top-0 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center">
           <div
-            className="h-0 w-0 border-x-[14px] border-t-[22px] border-x-transparent border-t-fuchsia-950 drop-shadow-md"
+            className="h-0 w-0 border-x-[12px] border-t-[18px] border-x-transparent border-t-fuchsia-950 drop-shadow-md"
             aria-hidden
           />
         </div>
-        <div className="flex justify-center pt-5">
+        <div className="absolute inset-0 flex items-start justify-center pt-3">
           <SpinWheel
             size={wheelSize}
             segments={visualSegments.length > 0 ? visualSegments : uniformSegments(wheelTopics)}
